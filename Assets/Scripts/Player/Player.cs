@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using DG.Tweening;
+using JetBrains.Annotations;
 public class Player : MonoBehaviour
 {
     public Rigidbody2D myRigidbody;
@@ -19,6 +20,11 @@ public class Player : MonoBehaviour
     public float animationduration = .3f;
     public Ease ease = Ease.OutBack;
 
+    [Header("Animation Player")]
+    public string boolRun = "Run";
+    public Animator animator;
+    public float PlayerSwipeDuration = 1f;
+
     private float _currentSpeed;
   
     private void Update()
@@ -28,20 +34,43 @@ public class Player : MonoBehaviour
     }
     private void Handlemoviment()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl)) 
+        { 
            _currentSpeed = SpeedRun;
+            animator.speed = 2;
+        }
+
         else
-           _currentSpeed = Speed;
+        {
+            _currentSpeed = Speed;
+            animator.speed = 1;
+        }
+           
         if(Input.GetKey(KeyCode.LeftArrow))
         {
             //myrigidbody.MovePosition(myrigidbody.position - velocity * Time.deltaTime);
             myRigidbody.velocity = new Vector2 (-_currentSpeed, myRigidbody.velocity.y);
+            if (myRigidbody.transform.localScale.x != -1)
+            {
+                myRigidbody.transform.DOScaleX(-1, PlayerSwipeDuration);
+            }
+            animator.SetBool(boolRun, true);
         }
         else if(Input.GetKey(KeyCode.RightArrow))
         {
             //myrigidbody.MovePosition(myrigidbody.position + velocity * Time.deltaTime);
             myRigidbody.velocity = new Vector2(_currentSpeed, myRigidbody.velocity.y);
+            if (myRigidbody.transform.localScale.x != 1)
+            {
+                myRigidbody.transform.DOScaleX(1, PlayerSwipeDuration);
+            }
+            animator.SetBool(boolRun, true);
         }
+        else
+        {
+            animator.SetBool(boolRun, false);
+        }
+       
         if (myRigidbody.velocity.x > 0)
         {
             myRigidbody.velocity += friction;
